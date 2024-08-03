@@ -32,7 +32,6 @@ RegisterNUICallback('closeShop', function(data, cb)
         type = "closeShop",
     })
     SetNuiFocus(false, false)
-
     cb('ok')
 end)
 

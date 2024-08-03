@@ -39,9 +39,6 @@ window.addEventListener("message", function (event) {
           }),
         })
           .then((resp) => resp.json())
-          .then((resp) => {
-            console.log(resp);
-          })
           .catch((error) => {
             console.error("Error:", error);
           });
@@ -61,9 +58,6 @@ document.getElementById("close-button").addEventListener("click", function () {
     method: "POST",
   })
     .then((resp) => resp.json())
-    .then((resp) => {
-      console.log(resp);
-    })
     .catch((error) => {
       console.error("Error:", error);
     });
