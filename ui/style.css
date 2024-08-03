@@ -1,0 +1,143 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500&display=swap");
+
+* {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 200;
+}
+
+body {
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.shop-container {
+  background-color: #2c2c2c;
+  border-radius: 10px;
+  padding: 20px;
+  width: 40%;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.shop-container.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.shop-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.shop-title {
+  font-size: 24px;
+}
+
+.shop-title .highlight {
+  color: rgb(0, 110, 255);
+}
+
+.shop-subtitle {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.shop-items-container {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-right: 10px; 
+}
+
+.shop-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #444;
+  border-radius: 5px;
+}
+
+.item-name {
+  flex: 1;
+  margin-left: 10px;
+  font-size: 20px;
+}
+
+.item-price {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.buy-button {
+  background-color: #5cb85c;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+button i {
+  margin-right: 16px;
+}
+
+.buy-button:hover {
+  background-color: #4cae4c;
+}
+
+#close-button {
+  margin-top: 20px;
+  background-color: #d9534f;
+  border: none;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+}
+
+#close-button:hover {
+  background-color: #c9302c;
+  transition: all 0.3s ease-in-out;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #333;
+  border-radius: 5px;
+}
