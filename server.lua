@@ -14,12 +14,13 @@ end)
 
 
 RegisterServerEvent('sharky_mta_shop:buyItem')
-AddEventHandler('sharky_mta_shop:buyItem', function(item)
-    if not xPlayer then return end
+AddEventHandler('sharky_mta_shop:buyItem', function(item, price)
+    
 
-    local source = source
-    local xPlayer = ESX.GetPlayerFromId(source)
-    local price = 0
+    local _source = source
+    local xPlayer = ESX.GetPlayerFromId(_source)
+    price = 0
+    if not xPlayer then return end
     for _, shop in pairs(Config.Shops) do
         for _, shopItem in pairs(shop.items) do
             if shopItem.name == item then
@@ -29,13 +30,12 @@ AddEventHandler('sharky_mta_shop:buyItem', function(item)
         end
     end
     if price == 0 then
-        print("Item not found in any shop.")
         return
     end
     if xPlayer.getMoney() >= price then
         xPlayer.removeMoney(price)
-        xPlayer.addInventoryItem(item)
+        xPlayer.addInventoryItem(item, 1)
     else
-        print("Player does not have enough money.")
+        xPlayer.showNotification("Nincs elég pénzed!")
     end
 end)

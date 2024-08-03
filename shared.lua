@@ -24,9 +24,9 @@ Config.Shops = {
         },
         items = {
             { name = "lockpick",            label = "Zártörő",         price = 200 },
-            { name = "WEAPON_PISTOL",       label = "Pisztoly",        price = 5000 },
-            { name = "WEAPON_COMBATPISTOL", label = "Combat Pisztoly", price = 10000 },
-            { name = "WEAPON_SMG",          label = "SMG",             price = 15000 },
+            { name = "weapon_pistol",       label = "Pisztoly",        price = 5000 },
+            { name = "weapon_combatpistol", label = "Combat Pisztoly", price = 10000 },
+            { name = "weapon_smg",          label = "SMG",             price = 15000 },
         }
     }
 }

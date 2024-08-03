@@ -22,7 +22,8 @@ end)
 
 RegisterNUICallback('buyItem', function(data, cb)
     local itemName = data.itemName
-    TriggerServerEvent('sharky_mta_shop:buyItem', itemName)
+    local itemPrice = data.itemPrice
+    TriggerServerEvent('sharky_mta_shop:buyItem', itemName, itemPrice)
     cb('ok')
 end)
 
