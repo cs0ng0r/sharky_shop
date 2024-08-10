@@ -37,6 +37,7 @@ end)
 
 
 CreateThread(function()
+    createBlip()
     for k, v in pairs(Config.Shops) do
         local ped = v.ped
         RequestModel(GetHashKey(ped.model))
@@ -76,4 +77,18 @@ function DrawText3D(coords, text)
     AddTextComponentString(text)
     EndTextCommandDisplayText(0, 0)
     ClearDrawOrigin()
+end
+
+
+function createBlip()
+    for k, v in pairs(Config.Shops) do
+        local blip = AddBlipForCoord(v.coords.x, v.coords.y, v.coords.z)
+        SetBlipSprite(blip, 52)
+        SetBlipScale(blip, 0.7)
+        SetBlipColour(blip, 2)
+        SetBlipAsShortRange(blip, true)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentString('Bolt')
+        EndTextCommandSetBlipName(blip)
+    end
 end

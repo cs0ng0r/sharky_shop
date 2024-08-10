@@ -3,8 +3,8 @@ Config = {}
 
 Config.Shops = {
     {
-        coords = vector3(232.5624, -951.0651, 28.3046),
-        heading = 186.1466,
+        coords = vector3(24.4438, -1347.1002, 28.4970),
+        heading = 266.7772,
         ped = {
             model = "s_m_y_dealer_01",
             text = "Bolt ~o~(NPC)",
