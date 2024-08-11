@@ -49,6 +49,9 @@ CreateThread(function()
         SetEntityHeading(shopPed, v.heading)
         FreezeEntityPosition(shopPed, true)
         SetEntityAsMissionEntity(shopPed, true, true)
+        SetBlockingOfNonTemporaryEvents(shopPed, true)
+        SetEntityInvincible(shopPed, true)
+        SetModelAsNoLongerNeeded(GetHashKey(ped.model))
     end
     while true do
         Citizen.Wait(0)
