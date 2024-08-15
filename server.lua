@@ -14,7 +14,7 @@ end)
 
 
 RegisterServerEvent('sharky_mta_shop:buyItem')
-AddEventHandler('sharky_mta_shop:buyItem', function(item, price)
+AddEventHandler('sharky_mta_shop:buyItem', function(item, price, quantity)
     
 
     local _source = source
@@ -33,8 +33,8 @@ AddEventHandler('sharky_mta_shop:buyItem', function(item, price)
         return
     end
     if xPlayer.getMoney() >= price then
-        xPlayer.removeMoney(price)
-        xPlayer.addInventoryItem(item, 1)
+        xPlayer.removeMoney(price * quantity)
+        xPlayer.addInventoryItem(item, quantity)
     else
         xPlayer.showNotification("Nincs elég pénzed!")
     end

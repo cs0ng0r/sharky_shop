@@ -1,10 +1,11 @@
 local shopItems = {}
 local shops = Config.Shops
 
-function openShop(coords)
+function getItems(coords)
     TriggerServerEvent('sharky_mta_shop:getItems', coords)
 end
 
+-- Event handler
 RegisterNetEvent('sharky_mta_shop:sendItems')
 AddEventHandler('sharky_mta_shop:sendItems', function(items)
     shopItems = items
@@ -17,14 +18,23 @@ end)
 
 RegisterNetEvent('sharky_mta_shop:noItemsFound')
 AddEventHandler('sharky_mta_shop:noItemsFound', function()
-    print("No items found for this shop.")
+    print("Nincs tárgy.")
 end)
 
+-- NUI Callbacks
 RegisterNUICallback('buyItem', function(data, cb)
     local itemName = data.itemName
     local itemPrice = data.itemPrice
-    TriggerServerEvent('sharky_mta_shop:buyItem', itemName, itemPrice)
-    cb('ok')
+    local itemQuantity = data.itemQuantity
+
+    if itemName and itemPrice and itemQuantity then
+        -- Send a server event with item details
+        TriggerServerEvent('sharky_mta_shop:buyItem', itemName, itemPrice, itemQuantity)
+        cb('ok')
+    else
+        print("Error: Missing item details")
+        cb('error')
+    end
 end)
 
 RegisterNUICallback('closeShop', function(data, cb)
@@ -35,9 +45,10 @@ RegisterNUICallback('closeShop', function(data, cb)
     cb('ok')
 end)
 
-
+-- Shop pedek létrehozása / Create shop peds
 CreateThread(function()
     createBlip()
+
     for k, v in pairs(Config.Shops) do
         local ped = v.ped
         RequestModel(GetHashKey(ped.model))
@@ -53,23 +64,24 @@ CreateThread(function()
         SetEntityInvincible(shopPed, true)
         SetModelAsNoLongerNeeded(GetHashKey(ped.model))
     end
+
     while true do
         Citizen.Wait(0)
         local playerPed = PlayerPedId()
         local playerCoords = GetEntityCoords(playerPed)
         for _, shop in pairs(shops) do
-            local distance = Vdist(playerCoords, shop.coords.x, shop.coords.y, shop.coords.z)
+            local distance = #(playerCoords - shop.coords)
             if distance < 2.0 then
                 DrawText3D(shop.coords + vec3(0, 0, 2.0), shop.ped.text)
                 if IsControlJustReleased(0, 38) then -- "E" key by default
-                    openShop(shop.coords)
+                    getItems(shop.coords)
                 end
             end
         end
     end
 end)
 
-
+-- DrawText3D
 function DrawText3D(coords, text)
     SetDrawOrigin(coords)
     SetTextScale(0.0, 0.4)
@@ -82,7 +94,7 @@ function DrawText3D(coords, text)
     ClearDrawOrigin()
 end
 
-
+-- Blip készítése / Blip creation
 function createBlip()
     for k, v in pairs(Config.Shops) do
         local blip = AddBlipForCoord(v.coords.x, v.coords.y, v.coords.z)
