@@ -1,4 +1,4 @@
-:flag_hu:  
+:hu:  
 # MTA Inspirálta Boltrendszer
 
 Ez a Sharky MTA stílusú boltrendszer egy egyszerű, mégis hatékony megoldás FiveM szerverek számára. Ideális választás, ha egy letisztult, könnyen kezelhető boltrendszert keresel a szerveredhez. A script alapvetően az ESX keretrendszerre készült, de könnyedén átdolgozható más keretrendszerekre is, így rugalmasan illeszthető bármilyen szerver igényeihez.
@@ -12,7 +12,7 @@ Ez a Sharky MTA stílusú boltrendszer egy egyszerű, mégis hatékony megoldás
 - **es_extended**
 ------------------------------------------------------------------------------------------------------------
 
-:flag_us:  
+:us:  
 # MTA Inspired Shop
 
 The Sharky MTA Style Shop is a simple yet effective shop system designed for FiveM servers. It's the perfect solution for those looking for a clean and user-friendly shop interface for their server. While the script is primarily developed for the ESX framework, it can be easily adapted to other frameworks, making it highly versatile for any server setup.
