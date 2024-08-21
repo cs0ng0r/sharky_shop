@@ -1,4 +1,4 @@
-:hu:  
+🇭🇺 
 # MTA Inspirálta Boltrendszer
 
 Ez a Sharky MTA stílusú boltrendszer egy egyszerű, mégis hatékony megoldás FiveM szerverek számára. Ideális választás, ha egy letisztult, könnyen kezelhető boltrendszert keresel a szerveredhez. A script alapvetően az ESX keretrendszerre készült, de könnyedén átdolgozható más keretrendszerekre is, így rugalmasan illeszthető bármilyen szerver igényeihez.
