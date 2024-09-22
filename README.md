@@ -12,15 +12,4 @@ Ez a Sharky MTA stílusú boltrendszer egy egyszerű, mégis hatékony megoldás
 - **es_extended**
 ------------------------------------------------------------------------------------------------------------
 
-:us:  
-# MTA Inspired Shop
-
-The Sharky MTA Style Shop is a simple yet effective shop system designed for FiveM servers. It's the perfect solution for those looking for a clean and user-friendly shop interface for their server. While the script is primarily developed for the ESX framework, it can be easily adapted to other frameworks, making it highly versatile for any server setup.
-
-### The script includes:
-- **Ped Placement at the Shop Location:** A ped can be placed at the shop location, which gives us access to the shop UI
-- **Text Above the Ped's Head:** Custom text can be displayed above the ped’s head, this can be turned off at any time in the config.
-- **Custom UI:** The shop's UI is fully customizable, allowing it to match the style of your server.
-
-### Required Scripts:
-- **es_extended**
+<img src="http://www.kepfeltoltes.eu/view.php?filename=859K_perny_337_k_p_2024_0.png">
