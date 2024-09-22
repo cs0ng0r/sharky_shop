@@ -12,5 +12,4 @@ Ez a Sharky MTA stílusú boltrendszer egy egyszerű, mégis hatékony megoldás
 - **es_extended**
 ------------------------------------------------------------------------------------------------------------
 
-<img src="http://www.kepfeltoltes.eu/view.php?filename=859K_perny_337_k_p_2024_0.png">
-<img src="http://www.kepfeltoltes.eu/view.php?filename=550K_perny_337_k_p_2024_0.png"> 
+<img src="http://www.kepfeltoltes.eu/images/2024/09/22/859K_perny_337_k_p_2024_0_tn.jpg">
