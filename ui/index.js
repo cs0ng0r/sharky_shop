@@ -1,105 +1,141 @@
-window.addEventListener("message", function (event) {
-  if (event.data.type === "openShop") {
-    const shopContainer = document.getElementById("shop");
-    shopContainer.style.display = "block";
-    setTimeout(() => {
-      shopContainer.classList.add("show");
-    }, 10);
+$(document).ready(function() {
+  window.addEventListener("message", function (event) {
+    if (event.data.type === "openShop") {
+      const shopContainer = $("#shop");
+      shopContainer.show();
+      setTimeout(() => {
+        shopContainer.addClass("show");
+      }, 10);
 
-    const shopItems = event.data.items;
-    const shopItemsContainer = document.getElementById("shop-items");
-    shopItemsContainer.innerHTML = "";
+      const shopItems = event.data.items;
+      const shopItemsContainer = $("#shop-items");
+      shopItemsContainer.empty();
 
-    shopItems.forEach((item) => {
-      const itemElement = document.createElement("div");
-      itemElement.className = "shop-item";
+      shopItems.forEach((item) => {
+        const itemElement = $(`
+          <div class="shop-item">
+            <div class="item-header">
+              <img src="nui://ox_inventory/web/images/${item.name}.png" alt="${item.label}" class="item-image">
+              <div class="item-info">
+                <div class="item-name">${item.label}</div>
+                <div class="item-price" data-base-price="${item.price}">$${parseFloat(item.price).toFixed(2)}</div>
+              </div>
+            </div>
+            <div class="item-controls">
+              <div class="quantity-control">
+                <button class="quantity-btn decrease" data-action="decrease">−</button>
+                <input type="number" class="quantity-input" value="1" min="1" max="100">
+                <button class="quantity-btn increase" data-action="increase">+</button>
+              </div>
+              <button class="buy-button" data-item-name="${item.name}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Vásárlás</span>
+              </button>
+            </div>
+          </div>
+        `);
 
-      itemElement.innerHTML = `
-        <img src="nui://ox_inventory/web/images/${item.name}.png" alt="${
-        item.label
-      }" class="item-image">
-        <span class="item-name">${item.label}</span>
-        <span class="item-price" data-base-price="${item.price}">${parseFloat(
-        item.price
-      ).toFixed(2)}$</span>
-        <div class="quantity-control">
-          <input type="number" class="quantity-input" value="1" min="1">
-          <button class="buy-button" data-item-name="${
-            item.name
-          }" data-item-price="${item.price}">
-            <i class="fas fa-shopping-cart"></i> Vásárlás
-          </button>
-        </div>
-      `;
+        shopItemsContainer.append(itemElement);
+      });
 
-      shopItemsContainer.appendChild(itemElement);
-    });
-
-    setupEventListeners();
-  } else if (event.data.type === "closeShop") {
-    const shopContainer = document.getElementById("shop");
-    shopContainer.classList.remove("show");
-    setTimeout(() => {
-      shopContainer.style.display = "none";
-    }, 300);
-  }
-});
-
-function setupEventListeners() {
-  document.querySelectorAll(".quantity-input").forEach((input) => {
-    input.addEventListener("input", function () {
-      updatePrice(this);
-    });
+      setupEventListeners();
+    } else if (event.data.type === "closeShop") {
+      closeShop();
+    }
   });
 
-  document.querySelectorAll(".buy-button").forEach((button) => {
-    button.addEventListener("click", function () {
-      const itemName = this.getAttribute("data-item-name");
-      const basePrice = parseFloat(this.getAttribute("data-item-price"));
+  function setupEventListeners() {
+    $(".quantity-input").off().on("input", function () {
+      validateAndUpdatePrice($(this));
+    });
+    
+    $(".quantity-input").off("blur").on("blur", function () {
+      if (!$(this).val() || $(this).val() < 1) {
+        $(this).val(1);
+        validateAndUpdatePrice($(this));
+      }
+    });
 
-      // Find the quantity input within the same shop-item
-      const itemElement = this.closest(".shop-item");
-      const quantityInput = itemElement.querySelector(".quantity-input");
-      const quantity = quantityInput.value;
+    $(".quantity-btn").off().on("click", function () {
+      const action = $(this).data("action");
+      const itemElement = $(this).closest(".shop-item");
+      const quantityInput = itemElement.find(".quantity-input");
+      let currentValue = parseInt(quantityInput.val()) || 1;
 
-      // Send item details to Lua
-      fetch(`https://${GetParentResourceName()}/buyItem`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        },
-        body: JSON.stringify({
+      if (action === "increase" && currentValue < 100) {
+        quantityInput.val(currentValue + 1);
+      } else if (action === "decrease" && currentValue > 1) {
+        quantityInput.val(currentValue - 1);
+      }
+
+      validateAndUpdatePrice(quantityInput);
+    });
+
+    $(".buy-button").off().on("click", function () {
+      const $button = $(this);
+      if ($button.prop("disabled")) return;
+
+      const itemName = $button.data("item-name");
+      const itemElement = $button.closest(".shop-item");
+      const quantityInput = itemElement.find(".quantity-input");
+      const quantity = parseInt(quantityInput.val()) || 1;
+
+      if (quantity > 0 && quantity <= 100) {
+        $button.prop("disabled", true).css("opacity", "0.6");
+        
+        $.post(`https://${GetParentResourceName()}/buyItem`, JSON.stringify({
           itemName: itemName,
-          itemPrice: basePrice,
           itemQuantity: quantity,
-        }),
-      })
-        .then((resp) => resp.json())
-        .catch((error) => console.error("Error:", error));
+        }))
+        .done(function() {
+          setTimeout(() => {
+            $button.prop("disabled", false).css("opacity", "1");
+          }, 1000);
+        })
+        .fail(function(error) {
+          console.error("Error:", error);
+          $button.prop("disabled", false).css("opacity", "1");
+        });
+      }
     });
-  });
-}
+  }
 
-function updatePrice(quantityInput) {
-  const itemElement = quantityInput.closest(".shop-item");
-  const itemPriceElement = itemElement.querySelector(".item-price");
-  const basePrice = parseFloat(itemPriceElement.dataset.basePrice);
-  const quantity = parseInt(quantityInput.value);
+  function validateAndUpdatePrice($quantityInput) {
+    const itemElement = $quantityInput.closest(".shop-item");
+    const itemPriceElement = itemElement.find(".item-price");
+    const basePrice = parseFloat(itemPriceElement.data("base-price"));
+    let quantity = parseInt($quantityInput.val());
 
-  if (!isNaN(quantity) && quantity > 0) {
+    if (isNaN(quantity) || quantity < 1) {
+      quantity = 1;
+      $quantityInput.val(1);
+    } else if (quantity > 100) {
+      quantity = 100;
+      $quantityInput.val(100);
+    }
+
     const totalPrice = basePrice * quantity;
-    itemPriceElement.textContent = `${totalPrice.toFixed(2)}$`;
+    itemPriceElement.text(`$${totalPrice.toFixed(2)}`);
   }
-}
 
-document.getElementById("close-button").addEventListener("click", function () {
-  fetch(`https://${GetParentResourceName()}/closeShop`, { method: "POST" })
-    .then((resp) => resp.json())
-    .catch((error) => console.error("Error:", error));
-});
-
-window.addEventListener("keyup", (e) => {
-  if (e.key === "Escape") {
-    fetch(`https://${GetParentResourceName()}/closeShop`, { method: "POST" });
+  function closeShop() {
+    const shopContainer = $("#shop");
+    shopContainer.removeClass("show");
+    setTimeout(() => {
+      shopContainer.hide();
+    }, 400);
   }
+
+  $("#close-button").on("click", function () {
+    $.post(`https://${GetParentResourceName()}/closeShop`)
+      .fail(function(error) {
+        console.error("Error:", error);
+      });
+  });
+
+  $(window).on("keyup", function(e) {
+    if (e.key === "Escape") {
+      $.post(`https://${GetParentResourceName()}/closeShop`);
+    }
+  });
 });

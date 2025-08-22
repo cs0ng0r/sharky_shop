@@ -5,6 +5,7 @@ description 'Shop UI for FiveM'
 author 'Cs0ng0r'
 
 shared_scripts {
+    '@ox_lib/init.lua',
     'shared.lua'
 }
 

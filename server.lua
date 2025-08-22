@@ -1,41 +1,73 @@
 local ESX = exports.es_extended:getSharedObject()
 
-RegisterServerEvent('sharky_mta_shop:getItems')
-AddEventHandler('sharky_mta_shop:getItems', function(coords)
-    local source = source
+local MAX_DISTANCE = 3.0
+
+local function isPlayerNearShop(playerId, shopCoords)
+    local playerPed = GetPlayerPed(playerId)
+    if not playerPed or playerPed == 0 then return false end
+
+    local playerCoords = GetEntityCoords(playerPed)
+    local distance = #(vector3(playerCoords.x, playerCoords.y, playerCoords.z) - shopCoords)
+    return distance <= MAX_DISTANCE
+end
+
+local function getShopByCoords(coords)
     for _, shop in pairs(Config.Shops) do
-        if shop.coords == coords then
-            TriggerClientEvent('sharky_mta_shop:sendItems', source, shop.items)
-            return
+        local distance = #(shop.coords - coords)
+        if distance < 1.0 then
+            return shop
         end
     end
-    TriggerClientEvent('sharky_mta_shop:noItemsFound', source)
-end)
+    return nil
+end
 
+local function validateItemInShop(itemName, shop)
+    for _, shopItem in pairs(shop.items) do
+        if shopItem.name == itemName then
+            return shopItem
+        end
+    end
+    return nil
+end
 
 RegisterServerEvent('sharky_mta_shop:buyItem')
-AddEventHandler('sharky_mta_shop:buyItem', function(item, price, quantity)
-    
-
+AddEventHandler('sharky_mta_shop:buyItem', function(itemName, quantity, shopCoords)
     local _source = source
     local xPlayer = ESX.GetPlayerFromId(_source)
-    price = 0
+
     if not xPlayer then return end
-    for _, shop in pairs(Config.Shops) do
-        for _, shopItem in pairs(shop.items) do
-            if shopItem.name == item then
-                price = shopItem.price
-                break
-            end
-        end
-    end
-    if price == 0 then
+
+    if not isPlayerNearShop(_source, shopCoords) then
+        TriggerClientEvent('chatMessage', _source, "[SHOP]", { 255, 0, 0 }, "Túl messze vagy a bolttól!")
         return
     end
-    if xPlayer.getMoney() >= price then
-        xPlayer.removeMoney(price * quantity)
-        xPlayer.addInventoryItem(item, quantity)
+
+    local shop = getShopByCoords(shopCoords)
+    if not shop then
+        TriggerClientEvent('chatMessage', _source, "[SHOP]", { 255, 0, 0 }, "Érvénytelen bolt!")
+        return
+    end
+
+    local shopItem = validateItemInShop(itemName, shop)
+    if not shopItem then
+        TriggerClientEvent('chatMessage', _source, "[SHOP]", { 255, 0, 0 }, "Ez a termék nem elérhető ebben a boltban!")
+        return
+    end
+
+    if type(quantity) ~= "number" or quantity <= 0 or quantity > 100 then
+        TriggerClientEvent('chatMessage', _source, "[SHOP]", { 255, 0, 0 }, "Érvénytelen mennyiség!")
+        return
+    end
+
+    quantity = math.floor(quantity)
+    local totalPrice = shopItem.price * quantity
+
+    if xPlayer.getMoney() >= totalPrice then
+        xPlayer.removeMoney(totalPrice)
+        xPlayer.addInventoryItem(itemName, quantity)
+        TriggerClientEvent('chatMessage', _source, "[SHOP]", { 0, 255, 0 },
+            string.format("Megvásároltál %dx %s-t $%d-ért!", quantity, shopItem.label or itemName, totalPrice))
     else
-        xPlayer.showNotification("Nincs elég pénzed!")
+        TriggerClientEvent('chatMessage', _source, "[SHOP]", { 255, 0, 0 }, "Nincs elég pénzed!")
     end
 end)

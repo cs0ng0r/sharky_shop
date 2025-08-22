@@ -1,35 +1,30 @@
-local shopItems = {}
 local shops = Config.Shops
+local isShopOpen = false
+local currentShop = nil
 
-function getItems(coords)
-    TriggerServerEvent('sharky_mta_shop:getItems', coords)
-end
+local function openShop(shop)
+    if isShopOpen then return end
 
--- Event handler
-RegisterNetEvent('sharky_mta_shop:sendItems')
-AddEventHandler('sharky_mta_shop:sendItems', function(items)
-    shopItems = items
+    currentShop = shop
+    isShopOpen = true
     SetNuiFocus(true, true)
     SendNUIMessage({
         type = "openShop",
-        items = shopItems
+        items = shop.items
     })
-end)
+end
 
-RegisterNetEvent('sharky_mta_shop:noItemsFound')
-AddEventHandler('sharky_mta_shop:noItemsFound', function()
-    print("Nincs tárgy.")
-end)
-
--- NUI Callbacks
 RegisterNUICallback('buyItem', function(data, cb)
     local itemName = data.itemName
-    local itemPrice = data.itemPrice
     local itemQuantity = data.itemQuantity
 
-    if itemName and itemPrice and itemQuantity then
-        -- Send a server event with item details
-        TriggerServerEvent('sharky_mta_shop:buyItem', itemName, itemPrice, itemQuantity)
+    if not isShopOpen or not currentShop then
+        cb('error')
+        return
+    end
+
+    if itemName and itemQuantity and type(itemQuantity) == "number" and itemQuantity > 0 then
+        TriggerServerEvent('sharky_mta_shop:buyItem', itemName, itemQuantity, currentShop.coords)
         cb('ok')
     else
         print("Error: Missing item details")
@@ -42,10 +37,11 @@ RegisterNUICallback('closeShop', function(data, cb)
         type = "closeShop",
     })
     SetNuiFocus(false, false)
+    isShopOpen = false
+    currentShop = nil
     cb('ok')
 end)
 
--- Shop pedek létrehozása / Create shop peds
 CreateThread(function()
     createBlip()
 
@@ -69,19 +65,29 @@ CreateThread(function()
         Citizen.Wait(0)
         local playerPed = PlayerPedId()
         local playerCoords = GetEntityCoords(playerPed)
+        local nearShop = false
+
         for _, shop in pairs(shops) do
             local distance = #(playerCoords - shop.coords)
             if distance < 2.0 then
+                nearShop = true
                 DrawText3D(shop.coords + vec3(0, 0, 2.0), shop.ped.text)
-                if IsControlJustReleased(0, 38) then -- "E" key by default
-                    getItems(shop.coords)
+                if IsControlJustReleased(0, 38) then
+                    openShop(shop)
                 end
+                break
             end
+        end
+
+        if not nearShop and isShopOpen then
+            SendNUIMessage({ type = "closeShop" })
+            SetNuiFocus(false, false)
+            isShopOpen = false
+            currentShop = nil
         end
     end
 end)
 
--- DrawText3D
 function DrawText3D(coords, text)
     SetDrawOrigin(coords)
     SetTextScale(0.0, 0.4)
@@ -94,7 +100,6 @@ function DrawText3D(coords, text)
     ClearDrawOrigin()
 end
 
--- Blip készítése / Blip creation
 function createBlip()
     for k, v in pairs(Config.Shops) do
         local blip = AddBlipForCoord(v.coords.x, v.coords.y, v.coords.z)
